@@ -1,4 +1,4 @@
-name: infra-home-texas2010-com
+name: infra-texas2010-com
 
 services:
   caddy:
@@ -13,7 +13,7 @@ services:
       DOMAIN: ${DOMAIN}
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CADDYFILE_PATH:-./Caddyfile}:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -28,7 +28,7 @@ services:
       - 'com.centurylinklabs.watchtower.enable=true'
     environment:
       SERVICE_NAME: api
-      INFRA_ENV: ${INFRA_ENV}
+      INFRA_LOCATION: ${INFRA_LOCATION}
       DOMAIN: ${DOMAIN}
       ALLOWED_ORIGIN: https://${DOMAIN}
       WATCHTOWER_NOTIFICATIONS_LEVEL: info
@@ -37,7 +37,24 @@ services:
     networks:
       - api_net
       # - backend_net
-      # - data_net
+
+  # gotham:
+  #   image:
+  #   restart: ${DOCKER_RESTART:-no}
+  #   profiles:
+  #     - cloud
+  #   environment:
+  #     INFRA_LOCATION: ${INFRA_LOCATION}
+  #     DOMAIN: ${DOMAIN}
+
+  # game2:
+  #   image:
+  #   restart: ${DOCKER_RESTART:-no}
+  #   profiles:
+  #     - cloud
+  #   environment:
+  #     INFRA_LOCATION: ${INFRA_LOCATION}
+  #     DOMAIN: ${DOMAIN}
 
   watchtower:
     image: containrrr/watchtower

@@ -1,6 +1,6 @@
 ## You can edit this
 SERVICE_TITLE := "Texas2010 Home Infrastructure"
-SERVICE_NAME := infra-home-texas2010-com
+SERVICE_NAME := infra-texas2010-com
 
 
 ## Do not edit below this line to end of the fine.
