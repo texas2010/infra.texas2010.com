@@ -57,7 +57,7 @@ if [ -z "$command" ]; then
     8|rebuild) command="rebuild" ;;
     9|config) command="config" ;;
     10|deploy) command="deploy" ;;
-    10|update) command="update" ;;
+    11|update) command="update" ;;
     *)
       docker_error "Invalid Docker command"
       exit 1
