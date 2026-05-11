@@ -29,11 +29,11 @@ select_infra_location() {
   echo
 }
 
-select_docker_env() {
-  local docker_env="${DOCKER_ENV:-$DEFAULT_DOCKER_ENV}"
+select_deploy_env() {
+  local deploy_env="${DEPLOY_ENV:-$DEFAULT_DEPLOY_ENV}"
 
-  if [ -z "$docker_env" ]; then
-    echo "Select Docker environment:"
+  if [ -z "$deploy_env" ]; then
+    echo "Select deploy environment:"
     echo "1) dev"
     echo "2) test"
     echo "3) prod"
@@ -41,23 +41,23 @@ select_docker_env() {
     read -r choice
 
     case "$choice" in
-      1|dev) docker_env="dev" ;;
-      2|test) docker_env="test" ;;
-      3|prod) docker_env="prod" ;;
-      *) echo -e "${RED}Invalid Docker Environment${RESET}"; exit 1 ;;
+      1|dev) deploy_env="dev" ;;
+      2|test) deploy_env="test" ;;
+      3|prod) deploy_env="prod" ;;
+      *) echo -e "${RED}Invalid deploy environment${RESET}"; exit 1 ;;
     esac
   fi
 
-  case "$docker_env" in
+  case "$deploy_env" in
     dev|test|prod) ;;
-    *) echo -e "${RED}Invalid DOCKER_ENV: $docker_env${RESET}"; exit 1 ;;
+    *) echo -e "${RED}Invalid DEPLOY_ENV: $deploy_env${RESET}"; exit 1 ;;
   esac
 
-  DOCKER_ENV="$docker_env"
+  DEPLOY_ENV="$deploy_env"
   echo
 }
 
 load_context() {
   select_infra_location
-  select_docker_env
+  select_deploy_env
 }

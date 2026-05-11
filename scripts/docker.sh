@@ -67,11 +67,11 @@ fi
 
 load_context
 
-full_project_name="${REPO_NAME}-${INFRA_LOCATION}-${DOCKER_ENV}"
-env_file=".env.${INFRA_LOCATION}.${DOCKER_ENV}"
+full_project_name="${REPO_NAME}-${INFRA_LOCATION}-${DEPLOY_ENV}"
+env_file=".env.${INFRA_LOCATION}.${DEPLOY_ENV}"
 
 echo -e "${GREEN}Infrastructure Location:${RESET} $INFRA_LOCATION"
-echo -e "${GREEN}Docker Environment:${RESET} $DOCKER_ENV"
+echo -e "${GREEN}Deploy Environment:${RESET} $DEPLOY_ENV"
 echo -e "${GREEN}Platform:${RESET} $full_project_name"
 echo -e "${GREEN}Env File Name:${RESET} $env_file"
 echo
@@ -162,7 +162,7 @@ case "$command" in
     docker_success "Stop containers complete."
 
     docker_info "Pulling latest code from prod branch..."
-    git checkout prod
+    git switch prod
     git pull --ff-only origin prod
 
     docker_info "Rebuilding images without cache..."

@@ -48,4 +48,4 @@ docker-help: ## [Docker] Show Docker subcommands
 	| awk 'BEGIN {FS=":.*?## "}; {printf "  %-22s %s\n", $$1, $$2}'
 
 docker-%:
-	@INFRA_LOCATION="$(or $(INFRA_LOCATION),$(INFRA))" DOCKER_ENV="$(DOCKER_ENV)" bash ./scripts/docker.sh "$*"
+	@INFRA_LOCATION="$(or $(INFRA_LOCATION),$(INFRA))" DEPLOY_ENV="$(DEPLOY_ENV)" bash ./scripts/docker.sh "$*"
