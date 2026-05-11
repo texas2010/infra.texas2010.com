@@ -21,6 +21,8 @@ node_modules
 *code-workspace
 
 .env
+.env*
+!.env.sample
 /config
 /data
 /log
