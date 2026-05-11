@@ -1,4 +1,4 @@
-name: com-texas2010-infra-${INFRA_LOCATION:-home}-${DOCKER_ENV:-development}
+name: com-texas2010-infra-${INFRA_LOCATION:-home}-${DEPLOY_ENV:-dev}
 
 services:
   caddy:
