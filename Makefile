@@ -32,10 +32,10 @@ DOCKER_HELP = \
 	ps:"[Docker] Show container status" \
 	status:"[Docker] Show container status" \
 	logs:"[Docker] Show logs" \
-	build:"[Docker] Rebuild images" \
+	build:"[Docker] Build images" \
 	clean:"[Docker] Remove containers, volumes, and orphans" \
 	rebuild:"[Docker] Rebuild images without cache" \
-	deploy:"[Docker] Deploying containers first time"
+	deploy:"[Docker] Build and start containers" \
 	update:"[Docker] Stop containers, Pull code, Rebuild images, Start containers"
 
 docker-help: ## [Docker] Show Docker subcommands
