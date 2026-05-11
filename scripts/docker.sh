@@ -163,7 +163,7 @@ case "$command" in
 
     docker_info "Pulling latest code from prod branch..."
     git checkout prod
-    git pull origin prod
+    git pull --ff-only origin prod
 
     docker_info "Rebuilding images without cache..."
     docker_compose build --no-cache
