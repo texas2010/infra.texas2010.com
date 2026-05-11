@@ -42,7 +42,9 @@ DOCKER_HELP = \
 	ps:"[Docker] Show container status" \
 	status:"[Docker] Show container status" \
 	logs:"[Docker] Show logs" \
-	build:"[Docker] Rebuild images"
+	build:"[Docker] Rebuild images" \
+	clean:"[Docker] Remove containers, volumes, and orphans" \
+	rebuild:"[Docker] Rebuild images without cache" \
 
 docker-help: ## [Docker] Show Docker subcommands
 	@echo "$(BOLD)Docker subcommands:$(RESET)"
