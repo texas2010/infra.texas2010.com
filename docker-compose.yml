@@ -1,4 +1,4 @@
-name: infra-home-texas2010-com
+name: com-texas2010-infra-${INFRA_LOCATION:-home}-${DOCKER_ENV:-development}
 
 services:
   caddy:
@@ -10,10 +10,10 @@ services:
       - '${HTTPS_PORT:-443}:443'
       - '${HTTP_PORT:-80}:80'
     environment:
-      - DOMAIN=${DOMAIN}
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      DOMAIN: ${DOMAIN}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-""}
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CADDYFILE_PATH:-./Caddyfile}:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -27,14 +27,34 @@ services:
     labels:
       - 'com.centurylinklabs.watchtower.enable=true'
     environment:
-      - DOMAIN=${DOMAIN}
-      - WATCHTOWER_NOTIFICATIONS_LEVEL=info
+      SERVICE_NAME: api
+      INFRA_LOCATION: ${INFRA_LOCATION}
+      DOMAIN: ${DOMAIN}
+      ALLOWED_ORIGIN: https://${DOMAIN}
+      WATCHTOWER_NOTIFICATIONS_LEVEL: info
     expose:
       - '3000' # container-only; Caddy can reach api:3000
     networks:
       - api_net
       # - backend_net
-      # - data_net
+
+  # gotham:
+  #   image:
+  #   restart: ${DOCKER_RESTART:-no}
+  #   profiles:
+  #     - cloud
+  #   environment:
+  #     INFRA_LOCATION: ${INFRA_LOCATION}
+  #     DOMAIN: ${DOMAIN}
+
+  # game2:
+  #   image:
+  #   restart: ${DOCKER_RESTART:-no}
+  #   profiles:
+  #     - cloud
+  #   environment:
+  #     INFRA_LOCATION: ${INFRA_LOCATION}
+  #     DOMAIN: ${DOMAIN}
 
   watchtower:
     image: containrrr/watchtower
