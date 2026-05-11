@@ -1,6 +1,9 @@
-## You can edit this
-SERVICE_TITLE := "Texas2010 Home Infrastructure"
-SERVICE_NAME := infra-texas2010-com
+ENV ?=
+INFRA_LOCATION ?= $(INFRA)
+
+INFRA_TITLE = "Texas2010 $(INFRA_LOCATION) Infrastructure"
+INFRA_FILE_NAME = com-texas2010-infra-$(INFRA_LOCATION)
+SYSTEMD_SERVICE_FILE = $(INFRA_FILE_NAME).service
 
 
 ## Do not edit below this line to end of the fine.
@@ -8,8 +11,6 @@ SERVICE_NAME := infra-texas2010-com
 .PHONY: help docker-% systemd-%
 
 ## === Variables ===
-COMPOSE_FILE := docker-compose.yml
-SYSTEMD_SERVICE_FILE := $(SERVICE_NAME).service
 SYSTEMCTL := sudo systemctl --no-pager
 
 # === Terminal Colors ===
@@ -45,6 +46,7 @@ DOCKER_HELP = \
 	build:"[Docker] Rebuild images" \
 	clean:"[Docker] Remove containers, volumes, and orphans" \
 	rebuild:"[Docker] Rebuild images without cache" \
+	deploy:"[Docker] Deploying containers"
 
 docker-help: ## [Docker] Show Docker subcommands
 	@echo "$(BOLD)Docker subcommands:$(RESET)"
@@ -56,23 +58,7 @@ docker-help: ## [Docker] Show Docker subcommands
 	| awk 'BEGIN {FS=":.*?## "}; {printf "  %-22s %s\n", $$1, $$2}'
 
 docker-%:
-	@cmd="$*"; \
-	case "$$cmd" in \
-		up)         echo "$(GREEN)[Docker] Starting containers $(SERVICE_NAME)...$(RESET)";; \
-		down)       echo "$(YELLOW)[Docker] Stopping and removing containers $(SERVICE_NAME)...$(RESET)";; \
-		restart)    echo "$(BLUE)[Docker] Restarting containers $(SERVICE_NAME)...$(RESET)";; \
-		ps|status)  echo "$(CYAN)[Docker] Showing container status...$(RESET)";; \
-		logs)       echo "$(CYAN)[Docker] Showing logs $(SERVICE_NAME)...$(RESET)";; \
-		build)      echo "$(CYAN)[Docker] Rebuilding images $(SERVICE_NAME)...$(RESET)";; \
-		*)          echo "$(RED)[Docker] Unknown command '$$cmd'$(RESET)"; exit 1;; \
-	esac; \
-	case "$$cmd" in \
-		up)      docker compose -f $(COMPOSE_FILE) up -d;; \
-		status)  docker compose -f $(COMPOSE_FILE) ps;; \
-		logs)    docker compose -f $(COMPOSE_FILE) logs -f;; \
-		*)       docker compose -f $(COMPOSE_FILE) $$cmd;; \
-	esac
-
+	@INFRA_LOCATION="$(or $(INFRA_LOCATION),$(INFRA))" DOCKER_ENV="$(DOCKER_ENV)" bash ./scripts/docker.sh "$*"
 
 # === Systemd Control ===
 SYSTEMD_HELP = \
@@ -95,27 +81,17 @@ systemd-help: ## [Systemd] Show Systemd subcommands
 
 systemd-%:
 	@case "$*" in \
-		start)    echo "$(GREEN)[Systemd] Starting $(SERVICE_NAME)...$(RESET)";; \
-		stop)     echo "$(YELLOW)[Systemd] Stopping $(SERVICE_NAME)...$(RESET)";; \
-		restart)  echo "$(BLUE)[Systemd] Restarting $(SERVICE_NAME)...$(RESET)";; \
-		status)   echo "$(CYAN)[Systemd] Checking status $(SERVICE_NAME)...$(RESET)";; \
-		enable)   echo "$(CYAN)[Systemd] Enabling $(SERVICE_NAME)...$(RESET)";; \
-		disable)  echo "$(CYAN)[Systemd] Disabling $(SERVICE_NAME)...$(RESET)";; \
+		start)    echo "$(GREEN)[Systemd] Starting $(INFRA_LOCATION)...$(RESET)";; \
+		stop)     echo "$(YELLOW)[Systemd] Stopping $(INFRA_LOCATION)...$(RESET)";; \
+		restart)  echo "$(BLUE)[Systemd] Restarting $(INFRA_LOCATION)...$(RESET)";; \
+		status)   echo "$(CYAN)[Systemd] Checking status $(INFRA_LOCATION)...$(RESET)";; \
+		enable)   echo "$(CYAN)[Systemd] Enabling $(INFRA_LOCATION)...$(RESET)";; \
+		disable)  echo "$(CYAN)[Systemd] Disabling $(INFRA_LOCATION)...$(RESET)";; \
 		*)        echo "$(RED)[Systemd] Unknown command '$*'$(RESET)"; exit 1;; \
 	esac
-	@$(SYSTEMCTL) $* $(SERVICE_NAME)
+	@$(SYSTEMCTL) $* $(SYSTEMD_SERVICE_FILE)
 
 # === Workflow ===
-
-docker-clean: ## [Docker] Remove containers, volumes, and orphans
-	@echo "$(YELLOW)[Docker] Removing containers, volumes, and orphans...$(RESET)"
-	docker compose -f $(COMPOSE_FILE) down -v --remove-orphans
-	docker system prune -f
-
-docker-rebuild: ## [Docker] Rebuild images without cache
-	@echo "$(CYAN)[Docker] Rebuilding images without cache...$(RESET)"
-	docker compose -f $(COMPOSE_FILE) build --no-cache
-	@$(MAKE) docker-up
 
 update-all: ## [System] Stop, update from Git, rebuild, and restart containers
 	@echo "$(YELLOW)[Docker] Stopping containers...$(RESET)"
@@ -131,7 +107,7 @@ create-systemd-service-file:
 	@mkdir -p logs
 	@echo "$(CYAN)[Systemd] Creating service file $(SYSTEMD_SERVICE_FILE)...$(RESET)"
 	@echo "[Unit]" > $(SYSTEMD_SERVICE_FILE)
-	@echo "Description=$(SERVICE_TITLE)" >> $(SYSTEMD_SERVICE_FILE)
+	@echo "Description=$(INFRA_TITLE)" >> $(SYSTEMD_SERVICE_FILE)
 	@echo "After=network.target docker.service" >> $(SYSTEMD_SERVICE_FILE)
 	@echo "Requires=docker.service" >> $(SYSTEMD_SERVICE_FILE)
 	@echo "" >> $(SYSTEMD_SERVICE_FILE)
@@ -151,16 +127,16 @@ create-systemd-service-file:
 systemd-create-file: create-systemd-service-file ## [Systemd] Build a .service file using the current directory
 
 systemd-install-file: create-systemd-service-file ## [Systemd] Move, reload, enable, and start service
-	@echo "$(CYAN)[Systemd] Installing $(SERVICE_NAME)...$(RESET)"
+	@echo "$(CYAN)[Systemd] Installing $(INFRA_LOCATION)...$(RESET)"
 	sudo mv $(SYSTEMD_SERVICE_FILE) /etc/systemd/system/
 	sudo systemctl daemon-reload
 	@$(MAKE) systemd-enable
 	@$(MAKE) systemd-start
 
 systemd-uninstall: ## [Systemd] Stop, disable, and remove the unit
-	@echo "$(YELLOW)[Systemd] Uninstalling $(SERVICE_NAME)...$(RESET)"
-	$(SYSTEMCTL) stop $(SERVICE_NAME) || true
-	$(SYSTEMCTL) disable $(SERVICE_NAME) || true
+	@echo "$(YELLOW)[Systemd] Uninstalling $(SYSTEMD_SERVICE_FILE)...$(RESET)"
+	$(SYSTEMCTL) stop $(SYSTEMD_SERVICE_FILE) || true
+	$(SYSTEMCTL) disable $(SYSTEMD_SERVICE_FILE) || true
 	sudo rm -f /etc/systemd/system/$(SYSTEMD_SERVICE_FILE)
 	sudo systemctl daemon-reload
 	@echo "$(RED)[Systemd] Removed: $(SYSTEMD_SERVICE_FILE)$(RESET)"
@@ -173,9 +149,9 @@ systemd-rebuild: systemd-stop ## [Systemd] Rebuild Docker images and restart ser
 	@$(MAKE) systemd-start
 
 systemd-logs: ## [Systemd] Show full logs from systemd journal
-	@echo "$(CYAN)[Systemd] Showing full logs for $(SERVICE_NAME)...$(RESET)"
-	@sudo journalctl -u $(SERVICE_NAME)
+	@echo "$(CYAN)[Systemd] Showing full logs for $(SYSTEMD_SERVICE_FILE)...$(RESET)"
+	@sudo journalctl -u $(SYSTEMD_SERVICE_FILE)
 
 systemd-logs-recent: ## [Systemd] Show recent logs and follow live
-	@echo "$(CYAN)[Systemd] Showing recent logs for $(SERVICE_NAME)...(Ctrl+C to stop)$(RESET)"
-	@sudo journalctl -u $(SERVICE_NAME) -n 50 -f
+	@echo "$(CYAN)[Systemd] Showing recent logs for $(SYSTEMD_SERVICE_FILE)...(Ctrl+C to stop)$(RESET)"
+	@sudo journalctl -u $(SYSTEMD_SERVICE_FILE) -n 50 -f
