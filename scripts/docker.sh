@@ -42,6 +42,7 @@ if [ -z "$command" ]; then
   echo "8) rebuild"
   echo "9) config"
   echo "10) deploy"
+  echo "11) update"
   printf "> "
   read -r choice
 
@@ -56,6 +57,7 @@ if [ -z "$command" ]; then
     8|rebuild) command="rebuild" ;;
     9|config) command="config" ;;
     10|deploy) command="deploy" ;;
+    10|update) command="update" ;;
     *)
       docker_error "Invalid Docker command"
       exit 1
@@ -152,6 +154,27 @@ case "$command" in
     docker_success "Deploy complete."
     ;;
 
+  update)
+    docker_info "Updating platform from prod branch..."
+
+    docker_info "Stopping containers..."
+    docker_compose down
+    docker_success "Stop containers complete."
+
+    docker_info "Pulling latest code from prod branch..."
+    git checkout prod
+    git pull origin prod
+
+    docker_info "Rebuilding images without cache..."
+    docker_compose build --no-cache
+    docker_success "Build complete."
+
+    docker_info "Starting containers..."
+    docker_compose up -d
+    docker_success "Start containers complete."
+
+    docker_success "Update complete."
+    ;;
 
   *)
     docker_error "Invalid Docker command: $command"
