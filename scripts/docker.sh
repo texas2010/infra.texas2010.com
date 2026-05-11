@@ -24,7 +24,7 @@ docker_compose() {
     --env-file "$env_file" \
     --project-name "$full_project_name" \
     --profile "$INFRA_LOCATION" \
-    -f "$COMPOSE_BASE_FILE" \
+    -f docker-compose.yml \
     "$@"
 }
 
@@ -68,25 +68,33 @@ load_context
 full_project_name="${REPO_NAME}-${INFRA_LOCATION}-${DOCKER_ENV}"
 env_file=".env.${INFRA_LOCATION}.${DOCKER_ENV}"
 
-echo -e "${GREEN}Infrastructure:${RESET} $INFRA_LOCATION"
-echo -e "${GREEN}Docker environment:${RESET} $DOCKER_ENV"
-echo -e "${GREEN}Project:${RESET} $full_project_name"
-echo -e "${GREEN}Compose file:${RESET} $COMPOSE_BASE_FILE"
-echo -e "${GREEN}Env file:${RESET} $env_file"
+echo -e "${GREEN}Infrastructure Location:${RESET} $INFRA_LOCATION"
+echo -e "${GREEN}Docker Environment:${RESET} $DOCKER_ENV"
+echo -e "${GREEN}Platform:${RESET} $full_project_name"
+echo -e "${GREEN}Env File Name:${RESET} $env_file"
 echo
 
 case "$command" in
   up)
+    docker_info "Starting containers..."
     docker_compose up -d
+    docker_success "Start containers complete."
     ;;
 
   down)
+    docker_info "Stopping containers..."
     docker_compose down
+    docker_success "Stop containers complete."
     ;;
 
   restart)
+    docker_info "Restarting containers..."
+    docker_info "Stopping containers..."
     docker_compose down
+    docker_success "Stop containers complete."
+    docker_info "Starting containers..."
     docker_compose up -d
+    docker_success "Start containers complete."
     ;;
 
   logs)
@@ -98,7 +106,9 @@ case "$command" in
     ;;
 
   build)
+    docker_info "Building containers..."
     docker_compose build
+    docker_success "Build containers complete."
     ;;
 
   clean)

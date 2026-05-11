@@ -16,7 +16,7 @@ select_infra_location() {
     case "$choice" in
       1|home) infra="home" ;;
       2|cloud) infra="cloud" ;;
-      *) echo -e "${RED}Invalid infrastructure${RESET}"; exit 1 ;;
+      *) echo -e "${RED}Invalid infrastructure location${RESET}"; exit 1 ;;
     esac
   fi
 
@@ -26,6 +26,7 @@ select_infra_location() {
   esac
 
   INFRA_LOCATION="$infra"
+  echo
 }
 
 select_docker_env() {
@@ -43,7 +44,7 @@ select_docker_env() {
       1|dev) docker_env="dev" ;;
       2|test) docker_env="test" ;;
       3|prod) docker_env="prod" ;;
-      *) echo -e "${RED}Invalid Docker environment${RESET}"; exit 1 ;;
+      *) echo -e "${RED}Invalid Docker Environment${RESET}"; exit 1 ;;
     esac
   fi
 
@@ -53,6 +54,7 @@ select_docker_env() {
   esac
 
   DOCKER_ENV="$docker_env"
+  echo
 }
 
 load_context() {
