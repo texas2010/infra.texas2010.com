@@ -1,9 +1,15 @@
 :80 {
-    handle /api/* {
+    handle_path /api/* {
         reverse_proxy api:3000
     }
 
-    handle {
-        reverse_proxy frontend:4173
-    }
+    # handle {
+    #    reverse_proxy frontend:4173
+    # }
+}
+
+:443 {
+    tls internal
+
+    respond "HTTPS is disabled in test" 404
 }

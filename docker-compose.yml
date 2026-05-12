@@ -30,7 +30,6 @@ services:
       SERVICE_NAME: api
       INFRA_LOCATION: ${INFRA_LOCATION}
       DOMAIN: ${DOMAIN}
-      ALLOWED_ORIGIN: https://${DOMAIN}
       WATCHTOWER_NOTIFICATIONS_LEVEL: info
     expose:
       - '3000' # container-only; Caddy can reach api:3000
