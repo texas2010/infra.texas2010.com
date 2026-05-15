@@ -20,10 +20,17 @@ docker_error() {
 }
 
 docker_compose() {
+  local production_profile=""
+
+  if [ "$DEPLOY_ENV" = "prod" ]; then
+    production_profile="--profile production"
+  fi
+
   docker compose \
     --env-file "$env_file" \
     --project-name "$full_project_name" \
     --profile "$INFRA_LOCATION" \
+    $production_profile \
     -f docker-compose.yml \
     "$@"
 }
