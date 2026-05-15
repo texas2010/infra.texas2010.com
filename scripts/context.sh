@@ -26,7 +26,6 @@ select_infra_location() {
   esac
 
   INFRA_LOCATION="$infra"
-  echo
 }
 
 select_deploy_env() {
@@ -54,7 +53,6 @@ select_deploy_env() {
   esac
 
   DEPLOY_ENV="$deploy_env"
-  echo
 }
 
 load_context() {

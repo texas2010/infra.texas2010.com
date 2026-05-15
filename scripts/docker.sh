@@ -67,14 +67,31 @@ fi
 
 load_context
 
+current_format="${FORMAT:-}"
+is_json_output=false
+
+if [ -n "$current_format" ]; then
+  case "$current_format" in
+    json)
+      is_json_output=true
+      ;;
+    *)
+      docker_error "Invalid FORMAT: $current_format"
+      exit 1
+      ;;
+  esac
+fi
+
 full_project_name="${REPO_NAME}-${INFRA_LOCATION}-${DEPLOY_ENV}"
 env_file=".env.${INFRA_LOCATION}.${DEPLOY_ENV}"
 
-echo -e "${GREEN}Infrastructure Location:${RESET} $INFRA_LOCATION"
-echo -e "${GREEN}Deploy Environment:${RESET} $DEPLOY_ENV"
-echo -e "${GREEN}Platform:${RESET} $full_project_name"
-echo -e "${GREEN}Env File Name:${RESET} $env_file"
-echo
+if [ "$is_json_output" = false ]; then
+  echo -e "${GREEN}Infrastructure Location:${RESET} $INFRA_LOCATION"
+  echo -e "${GREEN}Deploy Environment:${RESET} $DEPLOY_ENV"
+  echo -e "${GREEN}Platform:${RESET} $full_project_name"
+  echo -e "${GREEN}Env File Name:${RESET} $env_file"
+  echo
+fi
 
 case "$command" in
   up)
@@ -140,8 +157,12 @@ case "$command" in
     ;;
 
   config)
-    docker_info "Showing resolved Docker Compose configuration..."
-    docker_compose config
+    if [ "$is_json_output" = true ]; then
+      docker_compose config --format json
+    else
+      docker_info "Showing resolved Docker Compose configuration..."
+      docker_compose config
+    fi
     ;;
 
   deploy)

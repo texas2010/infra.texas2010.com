@@ -1,6 +1,3 @@
-ENV ?=
-INFRA_LOCATION ?= $(INFRA)
-
 .DEFAULT_GOAL := help
 .PHONY: help docker-%
 
@@ -30,13 +27,13 @@ DOCKER_HELP = \
 	down:"[Docker] Stop and remove containers" \
 	restart:"[Docker] Restart containers" \
 	ps:"[Docker] Show container status" \
-	status:"[Docker] Show container status" \
 	logs:"[Docker] Show logs" \
 	build:"[Docker] Build images" \
 	clean:"[Docker] Remove containers, volumes, and orphans" \
 	rebuild:"[Docker] Rebuild images without cache" \
 	deploy:"[Docker] Build and start containers" \
-	update:"[Docker] Stop containers, Pull code, Rebuild images, Start containers"
+	update:"[Docker] Stop containers, Pull code, Rebuild images, Start containers" \
+	config:"[Docker] Show resolved Docker Compose config"
 
 docker-help: ## [Docker] Show Docker subcommands
 	@echo "$(BOLD)Docker subcommands:$(RESET)"
@@ -48,4 +45,4 @@ docker-help: ## [Docker] Show Docker subcommands
 	| awk 'BEGIN {FS=":.*?## "}; {printf "  %-22s %s\n", $$1, $$2}'
 
 docker-%:
-	@INFRA_LOCATION="$(or $(INFRA_LOCATION),$(INFRA))" DEPLOY_ENV="$(DEPLOY_ENV)" bash ./scripts/docker.sh "$*"
+	@INFRA_LOCATION="$(INFRA_LOCATION)" DEPLOY_ENV="$(DEPLOY_ENV)" FORMAT="$(FORMAT)" bash ./scripts/docker.sh "$*"
