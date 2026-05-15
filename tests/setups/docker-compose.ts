@@ -4,11 +4,13 @@ import {
   type WaitStrategy,
 } from 'testcontainers';
 
+type EnvObj = Record<string, string>;
+
 type StartDockerComposeOptions = {
   composeFilePath: string;
   composeFile: string | string[];
   projectName: string;
-  envFile?: string;
+  envObj?: EnvObj;
   profiles?: string[];
   waitStrategies?: Record<string, WaitStrategy>;
 };
@@ -21,7 +23,7 @@ export const startDockerCompose = async ({
   composeFilePath,
   composeFile,
   projectName,
-  envFile,
+  envObj,
   profiles = [],
   waitStrategies = {},
 }: StartDockerComposeOptions): Promise<StartedDockerCompose> => {
@@ -30,8 +32,8 @@ export const startDockerCompose = async ({
     composeFile
   ).withProjectName(projectName);
 
-  if (envFile) {
-    environment = environment.withEnvironmentFile(envFile);
+  if (envObj) {
+    environment = environment.withEnvironment(envObj);
   }
 
   if (profiles.length > 0) {

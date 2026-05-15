@@ -1,5 +1,5 @@
 import { describe, afterAll, beforeAll, expect, test } from 'vitest';
-import { startHomeDockerCompose } from '../../../../setups/home-docker-compose';
+import { startHomeDockerCompose } from '../../../setups/home-docker-compose';
 
 let home: Awaited<ReturnType<typeof startHomeDockerCompose>>;
 

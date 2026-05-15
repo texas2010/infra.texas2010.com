@@ -1,8 +1,8 @@
-# Welcome to Infrastructure config for my server 👋
+# Welcome to Infrastructure config for my project 👋
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
 
-> This repository provides the infrastructure I use to manage and run services on my server. It uses Docker and Docker Compose to keep everything consistent, portable, and easy to deploy.
+> This repository provides the infrastructure I use to manage and run services on my home or cloud server. It uses Docker and Docker Compose to keep everything consistent, portable, and easy to deploy.
 
 https://api.home.dev.texas2010.com:8443/ping
 
