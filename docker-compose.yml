@@ -12,6 +12,12 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://localhost/ >/dev/null || exit 1']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     volumes:
       - ${CADDYFILE_PATH:-./Caddyfile}:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

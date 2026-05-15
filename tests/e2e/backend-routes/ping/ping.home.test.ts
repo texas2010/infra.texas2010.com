@@ -5,11 +5,10 @@ let home: Awaited<ReturnType<typeof startHomeDockerCompose>>;
 
 beforeAll(async () => {
   home = await startHomeDockerCompose();
-  console.log('Home Base Url', home.baseUrl);
 });
 
 afterAll(async () => {
-  await home?.environment.down();
+  await home.environment.down();
 });
 
 describe('Route ping', () => {
@@ -19,5 +18,21 @@ describe('Route ping', () => {
 
     expect(response.status).toBe(200);
     expect(data).toStrictEqual({ ping: 'pong' });
+  });
+});
+
+describe('Route Root', () => {
+  test('GET /', async () => {
+    const service = home.environment.getContainer('api-1');
+    await service.restart();
+
+    const response = await fetch(`${home.baseUrl}/`);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toStrictEqual({
+      hello: 'world',
+      port: 3000,
+    });
   });
 });

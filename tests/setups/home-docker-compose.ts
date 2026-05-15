@@ -1,8 +1,15 @@
 import path from 'node:path';
+import getPort from 'get-port';
 import { Wait } from 'testcontainers';
 import { startDockerCompose } from './docker-compose';
 
 export const startHomeDockerCompose = async () => {
+  const httpsPort = await getPort();
+
+  const httpPort = await getPort({
+    exclude: [httpsPort],
+  });
+
   const composeFilePath = path.resolve(process.cwd());
 
   const envObj = {
@@ -13,8 +20,8 @@ export const startHomeDockerCompose = async () => {
 
     NODE_ENV: 'production',
 
-    HTTPS_PORT: '9443',
-    HTTP_PORT: '9080',
+    HTTPS_PORT: httpsPort.toString(),
+    HTTP_PORT: httpPort.toString(),
 
     DOMAIN: 'localhost',
 
@@ -28,12 +35,15 @@ export const startHomeDockerCompose = async () => {
     envObj,
     profiles: ['home'],
     waitStrategies: {
-      'caddy-1': Wait.forHttp('/api/ping', 80).forStatusCode(200),
+      'caddy-1': Wait.forHealthCheck(),
+      'api-1': Wait.forSuccessfulCommand(
+        'curl -fsS http://localhost:3000/ >/dev/null'
+      ),
     },
   });
 
-  const caddy = started.environment.getContainer('caddy-1');
-  const caddyPort = caddy.getMappedPort(80);
+  const caddyService = started.environment.getContainer('caddy-1');
+  const caddyPort = caddyService.getMappedPort(80);
 
   return {
     ...started,
