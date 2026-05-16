@@ -8,7 +8,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await home.environment.down();
+  await home?.environment.down();
 });
 
 describe('Route ping', () => {
